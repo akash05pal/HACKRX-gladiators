@@ -1,11 +1,21 @@
 # HackRx 6.0 LLM API
 
 ## Features
-- FastAPI backend
-- PDF/DOCX parsing
-- Semantic search (FAISS)
-- OpenAI GPT-4 answer generation
+- FastAPI backend with async processing
+- PDF/DOCX parsing with robust error handling
+- Semantic search (FAISS or Pinecone)
+- OpenAI GPT-4 with fallback to GPT-3.5-turbo
 - Bearer token authentication
+- Parallel question processing
+- Response time optimization (<30s)
+- Health check endpoints
+
+## Tech Stack
+- **Backend:** FastAPI
+- **Vector DB:** FAISS (default) or Pinecone (optional)
+- **LLM:** OpenAI GPT-4/3.5-turbo with automatic fallback
+- **Document Processing:** pdfplumber, python-docx
+- **Deployment:** Render/Heroku/Railway
 
 ## Setup
 1. Clone the repo
@@ -17,6 +27,8 @@
    ```
    OPENAI_API_KEY=sk-...
    API_BEARER_TOKEN=your-secret-token
+   USE_PINECONE=false  # Set to true for Pinecone
+   PINECONE_API_KEY=your-pinecone-key  # Optional
    ```
 4. Place your PDFs in the `downloads/` folder (for local testing)
 
@@ -37,10 +49,18 @@ uvicorn main:app --host 0.0.0.0 --port 8000
   }
   ```
 
+## Environment Variables
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `OPENAI_API_KEY` | Yes | Your OpenAI API key |
+| `API_BEARER_TOKEN` | Yes | Secret token for authentication |
+| `USE_PINECONE` | No | Set to "true" to use Pinecone instead of FAISS |
+| `PINECONE_API_KEY` | No | Required if USE_PINECONE=true |
+
 ## Deployment
-### Railway/Heroku/Render
+### Render/Heroku/Railway
 - Deploy from GitHub
-- Set `OPENAI_API_KEY` and `API_BEARER_TOKEN` in the platform's environment variables
+- Set environment variables in the platform's dashboard
 - For Heroku/Render, ensure `Procfile` is present
 
 ## Example Request (curl)
@@ -49,4 +69,14 @@ curl -X POST "https://your-app-url/hackrx/run" \
   -H "Authorization: Bearer your-secret-token" \
   -H "Content-Type: application/json" \
   -d '{"documents": "downloads/yourfile.pdf", "questions": ["What is covered?"]}'
-``` 
+```
+
+## Health Check
+- **GET** `/` - API status
+- **GET** `/health` - Health check endpoint
+
+## Performance
+- Optimized for <30s response time
+- Parallel question processing
+- Automatic model fallback (GPT-4 → GPT-3.5-turbo)
+- Efficient chunking and embedding 

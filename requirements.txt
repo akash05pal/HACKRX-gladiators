@@ -7,4 +7,5 @@ faiss-cpu
 requests
 pydantic
 numpy
-python-dotenv 
+python-dotenv
+pinecone-client
